@@ -2,19 +2,13 @@ import App from "./App";
 import { createBrowserRouter, redirect } from "react-router";
 import AuthPage from "./pages/AuthPage";
 import HomePage from "./pages/HomePage";
+import { executeOnce } from "./utils/utils";
 
-function runOnce(fn) {
-  let called = false;
 
-  return function (...args) {
-    if (called) return;
-    called = true;
-    return fn(...args);
-  };
-}
-const redirectOnceToAuth = runOnce(() => {
+const redirectOnceToAuth = executeOnce(() => {
     throw redirect('auth')
-});
+})
+
 export let router = createBrowserRouter([
     {
         path: "/",
