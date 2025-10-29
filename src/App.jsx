@@ -1,14 +1,12 @@
-import { Outlet } from 'react-router'
-import './styles/App.css'
-import { ROUTES } from './routes'
+import { Outlet } from 'react-router';
+import './styles/App.css';
+import { ROUTES } from './routes';
 function App() {
-
   return (
     <>
-  <Outlet />
-  </>
-)
-   
+      <Outlet />
+    </>
+  );
 }
 
-export default App
+export default App;

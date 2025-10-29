@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 export default function RegisterForm() {
   const {
@@ -8,17 +8,17 @@ export default function RegisterForm() {
     watch,
     reset,
     formState: { errors, isSubmitting, isSubmitSuccessful },
-  } = useForm()
+  } = useForm();
 
-  const [showPassword, setShowPassword] = useState(false)
-  const password = watch('password', '')
+  const [showPassword, setShowPassword] = useState(false);
+  const password = watch('password', '');
 
   const onSubmit = async (data) => {
     // Simulate API call
-    await new Promise((r) => setTimeout(r, 800))
-    console.log('Registered user:', data)
-    reset()
-  }
+    await new Promise((r) => setTimeout(r, 800));
+    console.log('Registered user:', data);
+    reset();
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -97,8 +97,7 @@ export default function RegisterForm() {
         <input
           {...register('confirm', {
             required: 'Please confirm password',
-            validate: (value) =>
-              value === password || "Passwords don't match",
+            validate: (value) => value === password || "Passwords don't match",
           })}
           type={showPassword ? 'text' : 'password'}
           placeholder="Repeat password"
@@ -130,5 +129,5 @@ export default function RegisterForm() {
         </p>
       )}
     </form>
-  )
+  );
 }

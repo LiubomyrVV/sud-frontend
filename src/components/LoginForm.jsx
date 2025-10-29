@@ -1,26 +1,28 @@
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 export default function LoginForm() {
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm()
+  } = useForm();
 
-  const [showPassword, setShowPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (data) => {
     // Simulate API call
-    await new Promise((r) => setTimeout(r, 800))
-    console.log('Login data:', data)
-  }
+    await new Promise((r) => setTimeout(r, 800));
+    console.log('Login data:', data);
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {/* Email field */}
       <label className="block">
-        <span className="text-xs text-gray-600">Email</span>
+        <div className="flex">
+          <span className="text-xs text-gray-600">Email:</span>
+        </div>
         <input
           {...register('email', {
             required: 'Email is required',
@@ -42,8 +44,8 @@ export default function LoginForm() {
 
       {/* Password field */}
       <label className="block">
-        <div className="flex justify-between items-center">
-          <span className="text-xs text-gray-600">Password</span>
+        <div className="flex">
+          <span className="text-xs text-gray-600">Password:</span>
         </div>
 
         <div className="mt-1 relative">
@@ -84,5 +86,5 @@ export default function LoginForm() {
         {isSubmitting ? 'Signing in...' : 'Login'}
       </button>
     </form>
-  )
+  );
 }
