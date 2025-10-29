@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { registerUser } from '../api/api';
 import { useNavigate } from 'react-router';
+import { notify } from '../utils/toastify';
 
 export default function RegisterForm() {
   const {
@@ -13,7 +14,8 @@ export default function RegisterForm() {
   } = useForm();
   const navigate = useNavigate();
 
-  const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false);
+  const [responseStatus, setResponseStatus] = useState(null);
+  const [showNotify, setShowNotify] = useState(false);
   const [message, setMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const password = watch('password', '');
@@ -22,11 +24,11 @@ export default function RegisterForm() {
     const response = await registerUser(data);
 
     setMessage(response.message);
-    setIsSubmitSuccessful(response.status === 201 ? true : false);
-
+    setResponseStatus(response.status);
     if (response.status === 201) navigate('/auth/login');
-
+    setShowNotify(true);
     reset();
+    setTimeout(() => setShowNotify(false), 1000);
   };
 
   return (
@@ -140,13 +142,15 @@ export default function RegisterForm() {
         {isSubmitting ? 'Creating...' : 'Create account'}
       </button>
 
-      {isSubmitSuccessful ? (
+      {showNotify && responseStatus === 201 && notify('success', message)}
+      {showNotify && responseStatus !== 201 && notify('error', message)}
+      {/* {isSubmitSuccessful ? (
         <p className="text-center text-sm text-green-600">{message} ✅</p>
       ) : (
         <p className="text-center text-sm text-red-600">
           {message} {message === '' ? null : <>❌</>}
         </p>
-      )}
+      )} */}
     </form>
   );
 }
