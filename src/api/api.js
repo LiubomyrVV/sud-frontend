@@ -1,16 +1,16 @@
 // api.js
-const BASE_URL = 'http://localhost:5000/api/users'; // поменяй на свой бэкенд
+const BASE_URL = 'http://localhost:5000/api/users';
 
 // ======= Helper =======
 function getAuthHeader() {
-  const token = localStorage.getItem('token'); // предполагаем, что токен хранится в localStorage
+  const token = localStorage.getItem('token');
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
 async function handleResponse(res) {
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'API error');
-  return data;
+
+  return { ...data, status: res.status };
 }
 
 // ======= Auth =======

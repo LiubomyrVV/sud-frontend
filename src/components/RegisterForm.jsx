@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { registerUser } from '../api/api';
+import { useNavigate } from 'react-router';
 
 export default function RegisterForm() {
   const {
@@ -7,16 +9,23 @@ export default function RegisterForm() {
     handleSubmit,
     watch,
     reset,
-    formState: { errors, isSubmitting, isSubmitSuccessful },
+    formState: { errors, isSubmitting },
   } = useForm();
+  const navigate = useNavigate();
 
+  const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false);
+  const [message, setMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const password = watch('password', '');
 
   const onSubmit = async (data) => {
-    // Simulate API call
-    await new Promise((r) => setTimeout(r, 800));
-    console.log('Registered user:', data);
+    const response = await registerUser(data);
+
+    setMessage(response.message);
+    setIsSubmitSuccessful(response.status === 201 ? true : false);
+
+    if (response.status === 201) navigate('/auth/login');
+
     reset();
   };
 
@@ -131,9 +140,11 @@ export default function RegisterForm() {
         {isSubmitting ? 'Creating...' : 'Create account'}
       </button>
 
-      {isSubmitSuccessful && (
-        <p className="text-center text-sm text-green-600">
-          Account created successfully ✅
+      {isSubmitSuccessful ? (
+        <p className="text-center text-sm text-green-600">{message} ✅</p>
+      ) : (
+        <p className="text-center text-sm text-red-600">
+          {message} {message === '' ? null : <>❌</>}
         </p>
       )}
     </form>
