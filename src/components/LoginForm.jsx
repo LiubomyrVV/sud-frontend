@@ -44,7 +44,7 @@ export default function LoginForm() {
 
       {/* Password field */}
       <label className="block">
-        <div className="flex">
+        <div className="flex start">
           <span className="text-xs text-gray-600">Password:</span>
         </div>
 
@@ -62,9 +62,9 @@ export default function LoginForm() {
           <button
             type="button"
             onClick={() => setShowPassword((s) => !s)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500"
+            className="absolute right-0 top-1/2 -translate-y-1/2 text-xs text-gray-500"
           >
-            {showPassword ? 'Hide' : 'Show'}
+            <span>{showPassword ? 'Hide' : 'Show'}</span>
           </button>
         </div>
 

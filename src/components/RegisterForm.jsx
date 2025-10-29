@@ -24,7 +24,9 @@ export default function RegisterForm() {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {/* Full name field */}
       <label className="block">
-        <span className="text-xs text-gray-600">Full name</span>
+        <div className="flex">
+          <span className="text-xs text-gray-600">Full name:</span>
+        </div>
         <input
           {...register('name', {
             required: 'Name is required',
@@ -43,12 +45,14 @@ export default function RegisterForm() {
 
       {/* Email field */}
       <label className="block">
-        <span className="text-xs text-gray-600">Email</span>
+        <div className="flex">
+          <span className="text-xs text-gray-600">Email:</span>
+        </div>
         <input
           {...register('email', {
             required: 'Email is required',
             pattern: {
-              value: /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/,
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
               message: 'Invalid email format',
             },
           })}
@@ -65,7 +69,9 @@ export default function RegisterForm() {
 
       {/* Password field */}
       <label className="block">
-        <span className="text-xs text-gray-600">Password</span>
+        <div className="flex">
+          <span className="text-xs text-gray-600">Password:</span>
+        </div>
         <div className="mt-1 relative">
           <input
             {...register('password', {
@@ -81,9 +87,9 @@ export default function RegisterForm() {
           <button
             type="button"
             onClick={() => setShowPassword((s) => !s)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500"
+            className="absolute right-0 top-1/2 -translate-y-1/2 text-xs text-gray-500"
           >
-            {showPassword ? 'Hide' : 'Show'}
+            <span>{showPassword ? 'Hide' : 'Show'}</span>
           </button>
         </div>
         {errors.password && (
@@ -93,7 +99,9 @@ export default function RegisterForm() {
 
       {/* Confirm password field */}
       <label className="block">
-        <span className="text-xs text-gray-600">Confirm password</span>
+        <div className="flex">
+          <span className="text-xs text-gray-600">Confirm password:</span>
+        </div>
         <input
           {...register('confirm', {
             required: 'Please confirm password',

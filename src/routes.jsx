@@ -3,6 +3,8 @@ import { createBrowserRouter, redirect } from 'react-router';
 import AuthPage from './pages/AuthPage';
 import HomePage from './pages/HomePage';
 import { executeOnce } from './utils/utils';
+import LoginForm from './components/LoginForm';
+import RegisterForm from './components/RegisterForm';
 
 const redirectOnceToAuth = executeOnce(() => {
   throw redirect('auth');
@@ -32,6 +34,10 @@ export let router = createBrowserRouter([
       {
         path: 'auth',
         Component: AuthPage,
+        children: [
+          { path: 'login', Component: LoginForm },
+          { path: 'register', Component: RegisterForm },
+        ],
         // loader exectutes before the route is rendered!
         // loader: ({ request, params }) =>
         //   fetch(`/api/show/${params.showId}.json`, {
