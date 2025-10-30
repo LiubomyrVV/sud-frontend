@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { loginUser } from '../api/api';
+import { Navigate, useNavigate } from 'react-router';
+import { notify } from '../utils/toastify';
 
 export default function LoginForm() {
   const {
@@ -7,12 +10,20 @@ export default function LoginForm() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm();
+  const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
 
+  const [message, setMessage] = useState('');
+  const [responseStatus, setResponseStatus] = useState(null);
+  const [showNotify, setShowNotify] = useState(false);
+
   const onSubmit = async (data) => {
-    // Simulate API call
-    await new Promise((r) => setTimeout(r, 800));
+    const response = await loginUser(data);
+    setMessage(response.message);
+    setResponseStatus(response.status);
+    if (response.status === 200) navigate('/home');
+    setShowNotify(true);
     console.log('Login data:', data);
   };
 
@@ -83,6 +94,8 @@ export default function LoginForm() {
           color: 'white',
         }}
       >
+        {showNotify && responseStatus === 200 && notify('success', message)}
+        {showNotify && responseStatus !== 200 && notify('error', message)}
         {isSubmitting ? 'Signing in...' : 'Login'}
       </button>
     </form>

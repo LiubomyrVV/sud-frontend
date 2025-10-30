@@ -1,7 +1,22 @@
 import React from 'react';
+import { logoutUser } from '../api/api';
+import { useNavigate } from 'react-router';
 
 const HomePage = () => {
-  return <div>HomePage</div>;
+  const navigate = useNavigate();
+  return (
+    <>
+      <div>HomePage</div>
+      <button
+        onClick={() => {
+          logoutUser();
+          navigate('/auth');
+        }}
+      >
+        LOGOUT
+      </button>
+    </>
+  );
 };
 
 export default HomePage;
