@@ -15,6 +15,14 @@ async function handleResponse(res) {
 
 // ======= Auth =======
 
+export async function getUserInfo() {
+  const res = await fetch(`${BASE_URL}/me`, {
+    method: 'GET',
+    credentials: 'include',
+  });
+  return handleResponse(res);
+}
+
 // Register new user
 export async function registerUser({ name, email, password }) {
   const res = await fetch(`${BASE_URL}/register`, {
@@ -29,17 +37,30 @@ export async function registerUser({ name, email, password }) {
 export async function loginUser({ email, password }) {
   const res = await fetch(`${BASE_URL}/login`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify({ email, password }),
+    credentials: 'include',
   });
   const data = await handleResponse(res);
-  localStorage.setItem('token', data.token);
   return data;
 }
 
 // Logout user
-export function logoutUser() {
-  localStorage.removeItem('token');
+export async function logoutUser() {
+  const res = await fetch(`${BASE_URL}/logout`, {
+    method: 'POST',
+    credentials: 'include',
+  });
+
+  if (!res.ok) {
+    const data = await res.json();
+    throw new Error(data.message || 'Logout failed');
+  }
+
+  const data = await res.json();
+  return data; // { message: 'Logged out' }
 }
 
 // ======= Users =======
