@@ -6,38 +6,50 @@ import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
 import { getUserInfo } from './api/api';
 
+export const ROUTES = {
+  ROOT: '/',
+  AUTH: '/auth',
+  LOGIN: '/auth/login',
+  REGISTER: '/auth/register',
+  HOME: '/home',
+};
+
 export let router = createBrowserRouter([
   {
-    path: '/',
+    path: ROUTES.ROOT,
     Component: App,
     children: [
       {
-        path: 'auth',
+        index: true,
+        loader: async () => {
+          const data = await getUserInfo();
+          if (data?.email) return redirect(ROUTES.HOME);
+          return redirect(ROUTES.LOGIN);
+        },
+      },
+      {
+        path: ROUTES.AUTH,
         Component: AuthPage,
         loader: async () => {
           const data = await getUserInfo();
-          if (data?.email) throw redirect('/home');
+          if (data?.email) return redirect(ROUTES.HOME);
           return null;
         },
         children: [
+          { index: true, loader: () => redirect(ROUTES.LOGIN) },
           { path: 'login', Component: LoginForm },
           { path: 'register', Component: RegisterForm },
         ],
       },
       {
-        path: 'home',
+        path: ROUTES.HOME,
         Component: HomePage,
         loader: async () => {
           const data = await getUserInfo();
-          if (!data?.email) throw redirect('/auth');
+          if (!data?.email) return redirect(ROUTES.AUTH);
           return null;
         },
       },
     ],
   },
 ]);
-
-export const ROUTES = {
-  AUTH_URL: '/auth',
-  HOME_URL: '/home',
-};

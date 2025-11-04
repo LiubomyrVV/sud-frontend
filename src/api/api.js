@@ -1,20 +1,14 @@
-// api.js
 const BASE_URL = 'http://localhost:5000/api/users';
 
 // ======= Helper =======
-function getAuthHeader() {
-  const token = localStorage.getItem('token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
-
 async function handleResponse(res) {
-  const data = await res.json();
-
+  const data = await res.json().catch(() => ({}));
   return { ...data, status: res.status };
 }
 
 // ======= Auth =======
 
+// Get current user info (JWT in cookie)
 export async function getUserInfo() {
   const res = await fetch(`${BASE_URL}/me`, {
     method: 'GET',
@@ -29,6 +23,7 @@ export async function registerUser({ name, email, password }) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, email, password }),
+    credentials: 'include',
   });
   return handleResponse(res);
 }
@@ -37,14 +32,11 @@ export async function registerUser({ name, email, password }) {
 export async function loginUser({ email, password }) {
   const res = await fetch(`${BASE_URL}/login`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
     credentials: 'include',
   });
-  const data = await handleResponse(res);
-  return data;
+  return handleResponse(res);
 }
 
 // Logout user
@@ -53,25 +45,16 @@ export async function logoutUser() {
     method: 'POST',
     credentials: 'include',
   });
-
-  if (!res.ok) {
-    const data = await res.json();
-    throw new Error(data.message || 'Logout failed');
-  }
-
-  const data = await res.json();
-  return data; // { message: 'Logged out' }
+  return handleResponse(res);
 }
 
-// ======= Users =======
+// ======= Users (for admin) =======
 
 // Get all users (auth required)
 export async function getUsers() {
   const res = await fetch(`${BASE_URL}/`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...getAuthHeader(),
-    },
+    method: 'GET',
+    credentials: 'include',
   });
   return handleResponse(res);
 }
@@ -82,28 +65,22 @@ export async function getConsoleUsers() {
   return handleResponse(res);
 }
 
-// ======= Admin actions =======
-
-// Update user by id
+// Update user by id (admin)
 export async function updateUser(id, { name, email, role }) {
   const res = await fetch(`${BASE_URL}/${id}`, {
     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      ...getAuthHeader(),
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, email, role }),
+    credentials: 'include',
   });
   return handleResponse(res);
 }
 
-// Delete user by id
+// Delete user by id (admin)
 export async function deleteUser(id) {
   const res = await fetch(`${BASE_URL}/${id}`, {
     method: 'DELETE',
-    headers: {
-      ...getAuthHeader(),
-    },
+    credentials: 'include',
   });
   return handleResponse(res);
 }
