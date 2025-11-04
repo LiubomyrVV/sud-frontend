@@ -22,9 +22,14 @@ export let router = createBrowserRouter([
       {
         index: true,
         loader: async () => {
-          const data = await getUserInfo();
-          if (data?.email) return redirect(ROUTES.HOME);
-          return redirect(ROUTES.LOGIN);
+          try {
+            const data = await getUserInfo();
+            if (data?.email) return redirect(ROUTES.HOME);
+            return redirect(ROUTES.LOGIN);
+          } catch (error) {
+            console.error('Error in root loader:', error.message);
+            return redirect(ROUTES.LOGIN);
+          }
         },
       },
       {

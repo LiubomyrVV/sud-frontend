@@ -14,21 +14,20 @@ export default function RegisterForm() {
   } = useForm();
   const navigate = useNavigate();
 
-  const [responseStatus, setResponseStatus] = useState(null);
-  const [showNotify, setShowNotify] = useState(false);
-  const [message, setMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const password = watch('password', '');
 
   const onSubmit = async (data) => {
     const response = await registerUser(data);
 
-    setMessage(response.message);
-    setResponseStatus(response.status);
-    if (response.status === 201) navigate('/auth/login');
-    setShowNotify(true);
+    if (response.status === 201) {
+      notify('success', response.message);
+      navigate('/auth/login');
+    } else {
+      notify('error', response.message);
+    }
+
     reset();
-    setTimeout(() => setShowNotify(false), 1000);
   };
 
   return (
@@ -142,8 +141,6 @@ export default function RegisterForm() {
         {isSubmitting ? 'Creating...' : 'Create account'}
       </button>
 
-      {showNotify && responseStatus === 201 && notify('success', message)}
-      {showNotify && responseStatus !== 201 && notify('error', message)}
       {/* {isSubmitSuccessful ? (
         <p className="text-center text-sm text-green-600">{message} ✅</p>
       ) : (

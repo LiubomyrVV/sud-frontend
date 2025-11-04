@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { loginUser } from '../api/api';
-import { Navigate, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import { notify } from '../utils/toastify';
 
 export default function LoginForm() {
@@ -14,26 +14,30 @@ export default function LoginForm() {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const [message, setMessage] = useState('');
-  const [responseStatus, setResponseStatus] = useState(null);
-  const [showNotify, setShowNotify] = useState(false);
-
   const onSubmit = async (data) => {
-    const response = await loginUser(data);
-    setMessage(response.message);
-    setResponseStatus(response.status);
-    if (response.status === 200) navigate('/home');
-    setShowNotify(true);
-    console.log('Login data:', data);
+    try {
+      console.log('Submitting login form with data:', data);
+      const response = await loginUser(data);
+      if (!response) throw new Error('Server error');
+
+      if (response.status === 200) {
+        notify('success', response.message);
+        navigate('/home');
+      } else {
+        notify('error', response.message);
+      }
+
+      console.log('Login data:', data);
+    } catch (err) {
+      notify('error', err.message || 'Something went wrong');
+    }
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {/* Email field */}
+      {/* Email */}
       <label className="block">
-        <div className="flex">
-          <span className="text-xs text-gray-600">Email:</span>
-        </div>
+        <span className="text-xs text-gray-600">Email:</span>
         <input
           {...register('email', {
             required: 'Email is required',
@@ -44,7 +48,7 @@ export default function LoginForm() {
           })}
           type="email"
           placeholder="you@example.com"
-          className={`mt-1 block w-full rounded-lg border px-3 py-2 text-sm shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 ${
+          className={`mt-1 block w-full rounded-lg border px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-200 ${
             errors.email ? 'border-red-300' : 'border-gray-200'
           }`}
         />
@@ -53,12 +57,9 @@ export default function LoginForm() {
         )}
       </label>
 
-      {/* Password field */}
+      {/* Password */}
       <label className="block">
-        <div className="flex start">
-          <span className="text-xs text-gray-600">Password:</span>
-        </div>
-
+        <span className="text-xs text-gray-600">Password:</span>
         <div className="mt-1 relative">
           <input
             {...register('password', {
@@ -66,36 +67,33 @@ export default function LoginForm() {
             })}
             type={showPassword ? 'text' : 'password'}
             placeholder="Enter password"
-            className={`block w-full rounded-lg border px-3 py-2 text-sm shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 ${
+            className={`block w-full rounded-lg border px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-200 ${
               errors.password ? 'border-red-300' : 'border-gray-200'
             }`}
           />
           <button
             type="button"
             onClick={() => setShowPassword((s) => !s)}
-            className="absolute right-0 top-1/2 -translate-y-1/2 text-xs text-gray-500"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500"
           >
-            <span>{showPassword ? 'Hide' : 'Show'}</span>
+            {showPassword ? 'Hide' : 'Show'}
           </button>
         </div>
-
         {errors.password && (
           <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>
         )}
       </label>
 
-      {/* Submit button */}
+      {/* Submit */}
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full mt-1 inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium shadow-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+        className="w-full mt-2 inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium shadow-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed"
         style={{
           background: 'linear-gradient(90deg,#6366f1,#8b5cf6)',
           color: 'white',
         }}
       >
-        {showNotify && responseStatus === 200 && notify('success', message)}
-        {showNotify && responseStatus !== 200 && notify('error', message)}
         {isSubmitting ? 'Signing in...' : 'Login'}
       </button>
     </form>
