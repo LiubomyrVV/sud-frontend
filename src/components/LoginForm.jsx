@@ -16,7 +16,6 @@ export default function LoginForm() {
 
   const onSubmit = async (data) => {
     try {
-      console.log('Submitting login form with data:', data);
       const response = await loginUser(data);
       if (!response) throw new Error('Server error');
 
@@ -26,8 +25,7 @@ export default function LoginForm() {
       } else {
         notify('error', response.message);
       }
-
-      console.log('Login data:', data);
+ 
     } catch (err) {
       notify('error', err.message || 'Something went wrong');
     }
