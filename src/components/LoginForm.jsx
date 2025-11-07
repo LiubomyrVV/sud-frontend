@@ -25,7 +25,6 @@ export default function LoginForm() {
       } else {
         notify('error', response.message);
       }
- 
     } catch (err) {
       notify('error', err.message || 'Something went wrong');
     }
