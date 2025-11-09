@@ -33,8 +33,10 @@ export default function LoginForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {/* Email */}
-      <label className="block">
-        <span className="text-xs text-gray-600">Email:</span>
+      <label className="flex flex-col">
+        <span className="inline-block self-start text-xs text-gray-600 ">
+          Email:
+        </span>
         <input
           {...register('email', {
             required: 'Email is required',
@@ -55,8 +57,10 @@ export default function LoginForm() {
       </label>
 
       {/* Password */}
-      <label className="block">
-        <span className="text-xs text-gray-600">Password:</span>
+      <label className="flex flex-col">
+        <span className="inline-block self-start text-xs text-gray-600 ">
+          Password:
+        </span>
         <div className="mt-1 relative">
           <input
             {...register('password', {
@@ -71,9 +75,9 @@ export default function LoginForm() {
           <button
             type="button"
             onClick={() => setShowPassword((s) => !s)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500"
+            className="absolute right-0 top-1/2 -translate-y-1/2 text-xs text-gray-500"
           >
-            {showPassword ? 'Hide' : 'Show'}
+            <span>{showPassword ? 'Hide' : 'Show'}</span>
           </button>
         </div>
         {errors.password && (
