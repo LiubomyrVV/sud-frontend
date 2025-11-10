@@ -1,21 +1,27 @@
 import { useEffect, useState } from 'react';
-import { getUsers, deleteUser, updateUser } from '../api/api';
+import { getUsers, deleteUser, updateUser, registerUser } from '../api/api';
 import { notify } from '../utils/toastify';
 import ConfirmDialog from './UI/AlertDialog';
 import UpdateUserDialog from './UI/UpdateUserDialog';
+import AddUserDialog from './UI/AddUserDialog';
 
 export default function UsersTable() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Confirm dialog state
   const [confirm, setConfirm] = useState({
     open: false,
     message: '',
     action: null,
   });
 
+  // Update dialog state
   const [editUser, setEditUser] = useState(null);
   const [updateOpen, setUpdateOpen] = useState(false);
+
+  // Add user dialog state
+  const [addOpen, setAddOpen] = useState(false);
 
   // Fetch users on mount
   useEffect(() => {
@@ -63,7 +69,7 @@ export default function UsersTable() {
     setUpdateOpen(true);
   };
 
-  // After submitting edit form
+  // Submit update form
   const handleUpdateSubmit = (formData) => {
     setUpdateOpen(false);
     setConfirm({
@@ -73,7 +79,7 @@ export default function UsersTable() {
     });
   };
 
-  // Confirm update and call API
+  // Confirm update
   const confirmUpdate = async (id, data) => {
     try {
       const res = await updateUser(id, data);
@@ -89,6 +95,23 @@ export default function UsersTable() {
       }
     } catch {
       notify('error', 'Failed to update user');
+    }
+  };
+
+  // Submit add user form
+  const handleAddSubmit = async (data) => {
+    setAddOpen(false);
+    try {
+      const res = await registerUser(data);
+      if (res.status === 200 || res.status === 201) {
+        setUsers((prev) => [...prev, { ...data, role: 'user' }]);
+        console.log(users); // add new user to table
+        notify('success', 'User added successfully');
+      } else {
+        notify('error', res.message || 'Failed to add user');
+      }
+    } catch {
+      notify('error', 'Failed to add user');
     }
   };
 
@@ -113,7 +136,7 @@ export default function UsersTable() {
         </thead>
 
         <tbody
-          className={`divide-y divide-gray-100 ${users.length === 0 ? 'h-[55vh]' : null}`}
+          className={`divide-y divide-gray-100 ${users.length === 0 ? 'h-[55vh]' : ''}`}
         >
           {users.length === 0 ? (
             <tr>
@@ -127,10 +150,10 @@ export default function UsersTable() {
           ) : (
             users.map((user) => (
               <tr
-                key={user._id}
+                key={user.id}
                 className="hover:bg-indigo-50 transition-colors duration-200"
               >
-                <td className="px-5 py-3">{user.name}</td>
+                <td className="px-5 py-3">{user?.name}</td>
                 <td className="px-5 py-3">
                   {user.email ? (
                     user.email
@@ -144,7 +167,7 @@ export default function UsersTable() {
                   )}
                 </td>
                 <td className="px-5 py-3 text-center align-middle">
-                  <div className="flex flex-col items-center justify-center gap-1">
+                  <div className="flex flex-col justify-center gap-1 ">
                     <button
                       onClick={() =>
                         openConfirm(
@@ -167,10 +190,23 @@ export default function UsersTable() {
               </tr>
             ))
           )}
+
+          {/* Add user row */}
+          <tr
+            className="cursor-pointer hover:bg-indigo-100 transition-colors duration-200"
+            onClick={() => setAddOpen(true)}
+          >
+            <td
+              colSpan="4"
+              className="px-5 py-3 text-center text-indigo-500 font-bold"
+            >
+              + Add New User
+            </td>
+          </tr>
         </tbody>
       </table>
 
-      {/* Confirm Modal */}
+      {/* Confirm modal */}
       <ConfirmDialog
         open={confirm.open}
         title="Confirmation"
@@ -179,12 +215,19 @@ export default function UsersTable() {
         onClose={handleClose}
       />
 
-      {/* Update Modal */}
+      {/* Update modal */}
       <UpdateUserDialog
         open={updateOpen}
         user={editUser}
         onClose={() => setUpdateOpen(false)}
         onSubmit={handleUpdateSubmit}
+      />
+
+      {/* Add user modal */}
+      <AddUserDialog
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+        onSubmit={handleAddSubmit}
       />
     </div>
   );
