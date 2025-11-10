@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { getUsers, deleteUser } from '../api/api';
+import { getUsers, deleteUser, updateUser } from '../api/api';
 import { notify } from '../utils/toastify';
 import ConfirmDialog from './UI/AlertDialog';
+import UpdateUserDialog from './UI/UpdateUserDialog';
 
 export default function UsersTable() {
   const [users, setUsers] = useState([]);
@@ -13,7 +14,10 @@ export default function UsersTable() {
     action: null,
   });
 
-  // Fetch all users on mount
+  const [editUser, setEditUser] = useState(null);
+  const [updateOpen, setUpdateOpen] = useState(false);
+
+  // Fetch users on mount
   useEffect(() => {
     const fetchData = async () => {
       const res = await getUsers();
@@ -27,26 +31,7 @@ export default function UsersTable() {
     fetchData();
   }, []);
 
-  // Delete user handler
-  const handleDelete = async (id) => {
-    const res = await deleteUser(id);
-    if (res.status === 200) {
-      setUsers((prev) => prev.filter((u) => u.id !== id));
-      notify('success', 'User deleted successfully');
-    } else {
-      notify('error', res.message || 'Failed to delete user');
-    }
-  };
-  const handleUpdate = async (id) => {
-    const res = await deleteUser(id);
-    if (res.status === 200) {
-      setUsers((prev) => prev.filter((u) => u.id !== id));
-      notify('success', 'User deleted successfully');
-    } else {
-      notify('error', res.message || 'Failed to delete user');
-    }
-  };
-
+  // Open confirm modal
   const openConfirm = (message, action) => {
     setConfirm({ open: true, message, action });
   };
@@ -59,6 +44,52 @@ export default function UsersTable() {
   const handleClose = () => {
     notify('info', 'Action cancelled');
     setConfirm((prev) => ({ ...prev, open: false }));
+  };
+
+  // Delete user
+  const handleDelete = async (id) => {
+    const res = await deleteUser(id);
+    if (res.status === 200) {
+      setUsers((prev) => prev.filter((u) => u.id !== id));
+      notify('success', 'User deleted successfully');
+    } else {
+      notify('error', res.message || 'Failed to delete user');
+    }
+  };
+
+  // Open update dialog
+  const handleUpdate = (user) => {
+    setEditUser(user);
+    setUpdateOpen(true);
+  };
+
+  // After submitting edit form
+  const handleUpdateSubmit = (formData) => {
+    setUpdateOpen(false);
+    setConfirm({
+      open: true,
+      message: `Are you sure you want to update ${editUser.name}?`,
+      action: () => confirmUpdate(editUser.id, formData),
+    });
+  };
+
+  // Confirm update and call API
+  const confirmUpdate = async (id, data) => {
+    try {
+      const res = await updateUser(id, data);
+      if (res.status === 200) {
+        setUsers((prev) =>
+          prev.map((u) => (u.id === id ? { ...u, ...data } : u))
+        );
+        notify('success', res.message || 'User updated successfully');
+      } else if (res.status === 204) {
+        notify('info', res.message || 'No changes made to the user');
+      } else {
+        notify('error', res.message || 'Failed to update user');
+      }
+    } catch {
+      notify('error', 'Failed to update user');
+    }
   };
 
   if (loading) {
@@ -81,7 +112,9 @@ export default function UsersTable() {
           </tr>
         </thead>
 
-        <tbody className="divide-y divide-gray-100 h-[55vh]">
+        <tbody
+          className={`divide-y divide-gray-100 ${users.length === 0 ? 'h-[55vh]' : null}`}
+        >
           {users.length === 0 ? (
             <tr>
               <td
@@ -124,12 +157,7 @@ export default function UsersTable() {
                       Delete
                     </button>
                     <button
-                      onClick={() =>
-                        openConfirm(
-                          'Are you sure you want to update this user?',
-                          () => handleUpdate(user.id)
-                        )
-                      }
+                      onClick={() => handleUpdate(user)}
                       className="p-1 text-blue-600 hover:underline"
                     >
                       Update
@@ -141,12 +169,22 @@ export default function UsersTable() {
           )}
         </tbody>
       </table>
+
+      {/* Confirm Modal */}
       <ConfirmDialog
         open={confirm.open}
         title="Confirmation"
         message={confirm.message}
         onConfirm={handleConfirm}
         onClose={handleClose}
+      />
+
+      {/* Update Modal */}
+      <UpdateUserDialog
+        open={updateOpen}
+        user={editUser}
+        onClose={() => setUpdateOpen(false)}
+        onSubmit={handleUpdateSubmit}
       />
     </div>
   );
