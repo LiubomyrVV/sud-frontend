@@ -105,7 +105,6 @@ export default function UsersTable() {
       const res = await registerUser(data);
       if (res.status === 200 || res.status === 201) {
         setUsers((prev) => [...prev, { ...data, role: 'user' }]);
-        console.log(users); // add new user to table
         notify('success', 'User added successfully');
       } else {
         notify('error', res.message || 'Failed to add user');
