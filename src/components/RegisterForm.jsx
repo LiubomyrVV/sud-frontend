@@ -24,7 +24,7 @@ export default function RegisterForm() {
       notify('success', response.message);
       navigate('/auth/login');
     } else {
-      notify('error', response.message);
+      notify('error', response.message || 'Registration failed');
     }
 
     reset();

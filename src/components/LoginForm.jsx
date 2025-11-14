@@ -23,7 +23,7 @@ export default function LoginForm() {
         notify('success', response.message);
         navigate('/home');
       } else {
-        notify('error', response.message);
+        notify('error', response.message || 'Login failed');
       }
     } catch (err) {
       notify('error', err.message || 'Something went wrong');
